@@ -11,11 +11,11 @@ public class Dash : Ability {
     private Vector2 _userDirection;
 
     public Dash(Player user) : base(user) {
-        _cooldown = 2.0f;
+        _cooldown = 1.0f;
         _cooldownTimer.SetResetTime(_cooldown);
         _cooldownTimer.AddTime(_cooldown);
 
-        _effectTimer = new Timer(0.2f);
+        _effectTimer = new Timer(0.3f);
     }
 
     override protected IEnumerator InternalUse() {
@@ -33,7 +33,7 @@ public class Dash : Ability {
             float verTranslation = _userDirection.y * _user._speed * 10.0f * elapsedTime;
             float horTranslation = _userDirection.x * _user._speed * 10.0f * elapsedTime;
 
-            _user.transform.Translate(verTranslation, 0, -horTranslation);
+            _user.transform.Translate(horTranslation, 0, verTranslation, Space.World);
 
             yield return new WaitForSeconds(Time.deltaTime); // sleep for deltaTime time
         }

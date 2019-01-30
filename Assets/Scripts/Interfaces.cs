@@ -2,8 +2,8 @@
 
 namespace colorFoolCombatInterfaces {
 	public interface IDamageable {
-		void TakeDamage(int d, GameObject caster);
-		void Kill(GameObject caster);
+		void TakeDamage(int d, Entity caster);
+		void Kill(Entity caster);
 	}
 
 	public interface IHealable {

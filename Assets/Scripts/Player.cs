@@ -6,42 +6,48 @@ using colorFoolCombatInterfaces;
 
 // 26.565051177078  angle due to player movement
 
-public class Player : MonoBehaviour, IDamageable, IHealable {
+public class Player : Entity, IDamageable, IHealable {
 
-	public int Life { get { return _life; } }
-	public int MaxLife { get { return _maxLife; } }
-	public bool IsDead { get { return _isDead; } }
+    public int Life { get { return _life; } }
+    public int MaxLife { get { return _maxLife; } }
+    public bool IsDead { get { return _isDead; } }
     public bool UsingMoveAbility { get { return _usingMoveAbility; } set { _usingMoveAbility = value; } }
+
+    private Animator _anim;
+    private BoxCollider _collider;
 
     public Dictionary<string, float> _baseStats;
     protected int _life;
     protected int _maxLife;
     public float _speed;
-	private bool _isDead;
+    private bool _isDead;
     private Vector3 _lastPosition;
     private Vector3 _direction;
 
-	private Ability[] _abilities;
+    private Ability[] _abilities;
     private bool _usingMoveAbility;
 
-	protected void Awake() {
+    protected void Awake() {
         _baseStats = new Dictionary<string, float>();
         _baseStats.Add("_speed", 7f);
 
         _speed = _baseStats["_speed"];
 
         _usingMoveAbility = false;
-
     }
 
-	protected void Start() {
+    protected void Start() {
+        _anim = GetComponent<Animator>();
+        _collider = GetComponent<BoxCollider>();
+
         _abilities = new Ability[4];
         _abilities[0] = new Dash(this);
+        _abilities[1] = new WaterSlash(this);
 
-		_isDead = false;
-	}
+        _isDead = false;
+    }
 
-	protected void Update() {
+    protected void Update() {
         Timer.Update(Time.deltaTime);
 
         _lastPosition = transform.position;
@@ -49,10 +55,20 @@ public class Player : MonoBehaviour, IDamageable, IHealable {
         if (!_usingMoveAbility)
             Move();
 
-        if(Input.GetButton("Space")) {
-            _abilities[0].Use();
+        if (Input.GetButton("Space")) {
+            if (_abilities[0].Use()) {
+                _anim.SetTrigger("Dash");
+            }
         }
-	}
+        if (Input.GetButton("Fire1")) {
+            if (_abilities[1].Use()) {
+            }
+        }
+    }
+
+    protected void FixedUpdate() {
+        HitBoxupdate();
+    }
 
     protected void Move() {
         float elapsedTime = Time.deltaTime;
@@ -68,7 +84,11 @@ public class Player : MonoBehaviour, IDamageable, IHealable {
         }
     }
 
-	public virtual void TakeDamage(int damage, GameObject caster) {
+    private void HitBoxupdate() {
+        _collider.center = new Vector3(_collider.center.x, _anim.GetFloat("DashHeight"), _collider.center.z);
+    }
+
+    public virtual void TakeDamage(int damage, Entity caster) {
 		_life -= damage;
 
 		if(_life <= 0) {
@@ -85,7 +105,7 @@ public class Player : MonoBehaviour, IDamageable, IHealable {
             _life = _maxLife;
 	}
 
-	public virtual void Kill (GameObject caster) {
+	public virtual void Kill (Entity caster) {
 		_isDead = true;
 	}
 

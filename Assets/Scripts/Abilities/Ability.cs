@@ -21,13 +21,15 @@ public abstract class Ability
         _cooldownTimer.setAutoReset(true);
     }
 
-    public void Use() {
+    public bool Use() {
         _offCooldown = _cooldownTimer.Check();
         if (_offCooldown) {
             _user.StartCoroutine(InternalUse());
 
             _offCooldown = false;
+            return true;
         }
+        return false;
     }
 
     protected abstract IEnumerator InternalUse();
