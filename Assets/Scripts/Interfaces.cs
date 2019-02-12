@@ -2,11 +2,11 @@
 
 namespace colorFoolCombatInterfaces {
 	public interface IDamageable {
-		void TakeDamage(int d, Entity caster);
-		void Kill(Entity caster);
+		void TakeDamage(float d);
+		void Kill();
 	}
 
 	public interface IHealable {
-        void Heal(int h);
+        void Heal(float h);
 	}
 }

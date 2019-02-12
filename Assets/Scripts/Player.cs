@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,8 +9,8 @@ using colorFoolCombatInterfaces;
 
 public class Player : Entity, IDamageable, IHealable {
 
-    public int Life { get { return _life; } }
-    public int MaxLife { get { return _maxLife; } }
+    public float Life { get { return _life; } }
+    public float MaxLife { get { return _maxLife; } }
     public bool IsDead { get { return _isDead; } }
     public bool UsingMoveAbility { get { return _usingMoveAbility; } set { _usingMoveAbility = value; } }
 
@@ -17,12 +18,13 @@ public class Player : Entity, IDamageable, IHealable {
     private BoxCollider _collider;
 
     public Dictionary<string, float> _baseStats;
-    protected int _life;
-    protected int _maxLife;
+    public float _life;
+    public float _maxLife;
     public float _speed;
     private bool _isDead;
     private Vector3 _lastPosition;
     private Vector3 _direction;
+    private uint _state; // identifiant de la forme dans laquelle
 
     private Ability[] _abilities;
     private bool _usingMoveAbility;
@@ -30,19 +32,26 @@ public class Player : Entity, IDamageable, IHealable {
     protected void Awake() {
         _baseStats = new Dictionary<string, float>();
         _baseStats.Add("_speed", 7f);
+        _baseStats.Add("_maxLife", 100f);
 
         _speed = _baseStats["_speed"];
+        _maxLife = _baseStats["_maxLife"];
+        _life = _baseStats["_maxLife"];
+
+        _state = 0;
 
         _usingMoveAbility = false;
     }
 
     protected void Start() {
-        _anim = GetComponent<Animator>();
+        _anim = GetComponentInChildren<Animator>();
         _collider = GetComponent<BoxCollider>();
 
         _abilities = new Ability[4];
         _abilities[0] = new Dash(this);
         _abilities[1] = new WaterSlash(this);
+        _abilities[2] = new WaterTeleport(this);
+        _abilities[3] = new WaterRain(this);
 
         _isDead = false;
     }
@@ -56,12 +65,20 @@ public class Player : Entity, IDamageable, IHealable {
             Move();
 
         if (Input.GetButton("Space")) {
-            if (_abilities[0].Use()) {
+            if (_abilities[0 + 4 * _state].Use()) {
                 _anim.SetTrigger("Dash");
             }
         }
-        if (Input.GetButton("Fire1")) {
-            if (_abilities[1].Use()) {
+        if (Input.GetButton("Spell1")) {
+            if (_abilities[1 + 4 * _state].Use()) {
+            } 
+        }
+        if (Input.GetButton("Spell2")) {
+            if (_abilities[2 + 4 * _state].Use()) {
+            }
+        }
+        if (Input.GetButton("Spell3")) {
+            if (_abilities[3 + 4 * _state].Use()) {
             }
         }
     }
@@ -80,7 +97,18 @@ public class Player : Entity, IDamageable, IHealable {
 
         if (horizontal != 0 || vertical != 0) {
             _direction = transform.position - _lastPosition;
-            transform.LookAt(transform.position + _direction);
+
+            float angle = Vector3.SignedAngle(_direction, transform.forward, Vector3.up);
+            if (angle < 0)
+                transform.Rotate(0, Math.Min(-angle, 30), 0);
+            else
+                transform.Rotate(0, Math.Max(-angle, -30), 0);
+
+            //transform.LookAt(transform.position + _direction);
+
+            _anim.SetBool("Moving", true);
+        } else {
+            _anim.SetBool("Moving", false);
         }
     }
 
@@ -88,24 +116,24 @@ public class Player : Entity, IDamageable, IHealable {
         _collider.center = new Vector3(_collider.center.x, _anim.GetFloat("DashHeight"), _collider.center.z);
     }
 
-    public virtual void TakeDamage(int damage, Entity caster) {
+    public virtual void TakeDamage(float damage) {
 		_life -= damage;
 
 		if(_life <= 0) {
             _life = 0;
 
-			Kill(caster);
+			Kill();
 		}
 	}
 
-	public virtual void Heal(int heal) {
+	public virtual void Heal(float heal) {
         _life += heal; 
 
 		if (_life > _maxLife)
             _life = _maxLife;
 	}
 
-	public virtual void Kill (Entity caster) {
+	public virtual void Kill () {
 		_isDead = true;
 	}
 
