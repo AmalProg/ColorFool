@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class WaterTeleportTrigerrable : MonoBehaviour
 {
-    public GameObject waterTeleportPrefab;
-    public Transform teleportSpawn;
+    public GameObject _waterTeleportPrefab;
+    public Transform _teleportSpawn;
 
     public void Trigger() {
-        GameObject waterTeleportObj = UnityEngine.Object.Instantiate(waterTeleportPrefab,
-            teleportSpawn.position, transform.rotation);
+        GameObject waterTeleportObj = UnityEngine.Object.Instantiate(_waterTeleportPrefab,
+            _teleportSpawn.position, transform.rotation);
     }
 }

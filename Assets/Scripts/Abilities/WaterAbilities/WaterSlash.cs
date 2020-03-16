@@ -5,7 +5,7 @@ public class WaterSlash : Ability {
 
     private WaterSlashTrigerrable _trigger;
 
-    private float _castTime;
+    private readonly float _castTime;
 
     public WaterSlash(Player user) : base(user) {
         _cooldown = 1.0f;

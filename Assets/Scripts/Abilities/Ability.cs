@@ -1,27 +1,29 @@
 ﻿using System;
 using System.Collections;
-using System.Threading.Tasks;
-using System.Timers;
 using UnityEngine;
 
 
 public abstract class Ability
 {
-    public bool offCooldown { get { return _offCooldown; } }
+    public bool OffCooldown { get { return _offCooldown; } }
+    public float Cooldown { get { return _cooldown;  } }
+    public float ElapsedTime { get { return _cooldownTimer.ElapsedTime; } }
 
-    protected Player _user;
+    protected Entity _user;
+    protected Animator _userAnim;
     protected bool _offCooldown;
     protected float _cooldown;
     protected Timer _cooldownTimer;
 
-    protected Ability(Player user) {
+    protected Ability(Entity user) {
         _user = user;
+        _userAnim = _user.Anim;
         _offCooldown = true;
         _cooldownTimer = new Timer(_cooldown);
-        _cooldownTimer.setAutoReset(true);
+        _cooldownTimer.SetAutoReset(true);
     }
 
-    public bool Use() {
+    public virtual bool Use() {
         _offCooldown = _cooldownTimer.Check();
         if (_offCooldown) {
             _user.StartCoroutine(InternalUse());

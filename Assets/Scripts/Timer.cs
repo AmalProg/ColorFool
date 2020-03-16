@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Timer
 {
+    public float ElapsedTime { get { return _timeElapsed; } }
+
 	private static List<Timer> timers = new List<Timer>();
 
 	private float _timeElapsed;
@@ -20,6 +22,10 @@ public class Timer
 		_autoReset = false;
 	}
 
+    ~Timer() {
+        timers.Remove(this);
+    }
+
 	public static void Update (float elapsedTime)
 	{
 		foreach (Timer t in timers) {
@@ -32,7 +38,7 @@ public class Timer
 		_resetTime = time;
 	}
 
-	public void setAutoReset(bool auto) {
+	public void SetAutoReset(bool auto) {
 		_autoReset = auto;
 	}
 
@@ -41,7 +47,7 @@ public class Timer
 	}
 
 	public void Reset() {
-		_timeElapsed = 0.0f;
+        _timeElapsed = 0.0f;
 	}
 
 	public void Stop() {

@@ -22,6 +22,7 @@ public class Dash : Ability {
         _effectTimer.Reset();
 
         _user.UsingMoveAbility = true;
+        _userAnim.SetTrigger("Dash");
 
         Vector3 mousePos = Input.mousePosition;
         Vector2 centerPos = new Vector2(Screen.width / 2, Screen.height / 2);
@@ -30,8 +31,8 @@ public class Dash : Ability {
 
         while (!_effectTimer.Check()) {
             float elapsedTime = Time.deltaTime;
-            float verTranslation = _userDirection.y * _user._speed * 10.0f * elapsedTime;
-            float horTranslation = _userDirection.x * _user._speed * 10.0f * elapsedTime;
+            float verTranslation = _userDirection.y * _user.Speed * 10.0f * elapsedTime;
+            float horTranslation = _userDirection.x * _user.Speed * 10.0f * elapsedTime;
             _user.transform.Translate(horTranslation, 0, verTranslation, Space.World);
 
             // fast rotate in dash direction
